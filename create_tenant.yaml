@@ -1,0 +1,13 @@
+- name: Cria tenant no cisco ACI
+  hosts: localhost
+  tasks:
+  - name: "Adicionando um novo tenant {{ tenant_name }}"
+    cisco.aci.aci_tenant:
+      host: "{{ cisco_aci_endpoint }}"
+      use_ssl: true
+      username: "{{ cisco_aci_username }}"
+      password: "{{ cisco_aci_password }}"
+      tenant: "{{ tenant_name }}"
+      validate_certs: false
+      description: "{{ tenant_description }}"
+      state: present
