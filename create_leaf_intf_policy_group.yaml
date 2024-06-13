@@ -1,0 +1,34 @@
+- name: Fabric External Access Policy
+  gather_facts: false
+  hosts: "{{ cisco_aci_endpoint }}"
+
+  vars:
+    aci_login: &aci_login
+      host: '{{ cisco_aci_endpoint }}'
+      use_ssl: true
+      username: '{{ cisco_aci_username }}'
+      password: '{{ cisco_aci_password }}'
+      validate_certs: "{{ validate_certs }}"
+
+  tasks:
+    - name: Create a Leaf Interface Policy Group
+      cisco.aci.aci_interface_policy_leaf_policy_group:
+        <<: *aci_login
+        policy_group: "{{ item.name }}"
+        description: "{{ item.description if item.description is defined else omit }}"
+        lag_type: "{{ 'leaf' if item.interface_policy_group_type == 'Access' else 'link' if item.interface_policy_group_type == 'PC' else 'node' if item.interface_policy_group_type == 'vPC' }}"
+        link_level_policy: "{{ item.link_pol if item.link_pol is defined else omit }}"
+        cdp_policy: "{{ item.cdp_pol if item.cdp_pol is defined else omit }}"
+        mcp_policy: "{{ item.mcp_pol if item.mcp_pol is defined else omit }}"
+        lldp_policy: "{{ item.lldp_pol if item.lldp_pol is defined else omit }}"
+        stp_interface_policy: "{{ item.stp_pol if item.stp_pol is defined else omit }}"
+        port_channel_policy: "{{ item.lacp_pol if item.lacp_pol is defined and item.interface_policy_group_type != 'Access' else omit }}"
+        storm_control_interface_policy: "{{ item.storm_pol if item.storm_pol is defined else omit }}"
+        l2_interface_policy: "{{ item.l2_int_pol if item.l2_int_pol is defined else omit }}"
+        aep: "{{ item.aaep if item.aaep is defined else omit }}"
+        ingress_data_plane_policing_policy: "{{ item.ingress_data_plane_policing_policy if item.ingress_data_plane_policing_policy is defined and item.ingress_data_plane_policing_policy != '' else omit }}"
+        egress_data_plane_policing_policy: "{{ item.egress_data_plane_policing_policy if item.egress_data_plane_policing_policy is defined and item.egress_data_plane_policing_policy != '' else omit }}"
+        state: "{{ item.status }}"
+      delegate_to: localhost
+      with_items: "{{ interface_policy_group }}"
+      when: interface_policy_group is defined and item.switch_type == 'leaf'
