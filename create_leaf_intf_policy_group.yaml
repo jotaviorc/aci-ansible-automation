@@ -1,6 +1,6 @@
 - name: Fabric External Access Policy
   gather_facts: false
-  hosts: "{{ cisco_aci_endpoint }}"
+  hosts: localhost
 
   vars:
     aci_login: &aci_login
