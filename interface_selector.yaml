@@ -24,3 +24,17 @@
       delegate_to: localhost
       with_items: "{{ interface_selector }}"
       when: interface_selector is defined and item.interface_profile_type == 'leaf'
+
+
+    - name: Associate a Fabric access policy interface port block (single port) to an interface selector
+      cisco.aci.aci_access_port_block_to_access_port:
+        <<: *aci_login
+        interface_profile: "{{ item.interface_profile }}"
+        access_port_selector: "{{ item.name }}"
+        port_blk: "{{ item.port_blk_name if item.port_blk_name is defined else omit}}"
+        from_port: "{{ item.from_port }}"
+        to_port: "{{ item.to_port }}"
+        state: present
+      delegate_to: localhost
+      with_items: "{{ interface_selector }}"
+      when: interface_selector is defined and item.interface_profile_type == 'leaf'
