@@ -1,0 +1,26 @@
+- name: Fabric Interface Access Port Selector
+  gather_facts: false
+  hosts: "{{ cisco_aci_endpoint }}"
+
+  vars:
+    aci_login: &aci_login
+      host: '{{ cisco_aci_endpoint }}'
+      use_ssl: true
+      username: '{{ cisco_aci_username }}'
+      password: '{{ cisco_aci_password }}'
+      validate_certs: "{{ validate_certs }}"
+
+  tasks:
+    - name: Create an Interface Access Port Selector to an Interface Policy Leaf Profile with a Policy Group
+      cisco.aci.aci_access_port_to_interface_policy_leaf_profile:
+        <<: *aci_login
+        interface_profile: "{{ item.interface_profile }}"
+        access_port_selector: "{{ item.name }}"
+        description: "{{ item.description if item.description is defined else omit}}"
+        policy_group: "{{ item.interface_policy_group }}"
+        interface_type: "{{ 'vpc' if item.interface_polgroup_type == 'vPC' else 'port_channel' if item.interface_polgroup_type == 'PC' else 'switch_port' if item.interface_polgroup_type == 'Access' }}"
+        type: "{{ item.interface_profile_type }}"
+        state: "{{ item.status }}"
+      delegate_to: localhost
+      loop: "{{ interface_selector }}"
+      when: interface_selector is defined and item.interface_profile_type == 'leaf'
