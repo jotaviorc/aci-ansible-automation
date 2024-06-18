@@ -31,7 +31,7 @@
         <<: *aci_login
         interface_profile: "{{ item.interface_profile }}"
         access_port_selector: "{{ item.name }}"
-        port_blk: "{{ item.port_blk_name if item.port_blk_name is defined else omit}}"
+        port_blk: "{{ item.port_blk_name}}"
         from_port: "{{ item.from_port }}"
         to_port: "{{ item.to_port }}"
         state: present
