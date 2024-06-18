@@ -22,5 +22,5 @@
         type: "{{ item.interface_profile_type }}"
         state: "{{ item.status }}"
       delegate_to: localhost
-      loop: "{{ interface_selector }}"
+      with_items: "{{ interface_selector }}"
       when: interface_selector is defined and item.interface_profile_type == 'leaf'
